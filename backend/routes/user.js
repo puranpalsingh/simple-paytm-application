@@ -21,14 +21,13 @@ const zodSchmea = zod.object({
 route.post('/signup', async (req, res) => {
     try {
         const details = req.body;
-        console.log("Received signup request with details:", details);
+        
         const result = zodSchmea.safeParse(details);
         if(result.success) {
-            console.log("Validation successful");
-
+     
             const response = await User.findOne({username : details.username});
             if(!response) {
-                console.log("Username not found, creating new user");
+             
                 const newUser = await User.create({
                     username : details.username,
                     password : details.password,
@@ -45,7 +44,7 @@ route.post('/signup', async (req, res) => {
                     Balance : Math.floor(1 + Math.random() * 1000)
                 });
 
-                console.log("User created successfully");
+            
 
                 res.status(200).json({
                     msg: 'User created successfully', 
@@ -53,14 +52,14 @@ route.post('/signup', async (req, res) => {
                 });
             }
             else { 
-                console.log("Username already exists");
+               
                 return res.status(400).json({
                     msg : 'zod error occur'
                 });
             }
         }
         else {
-            console.log("Validation failed with errors:", result.error.errors);
+           
             return res.status(400).json({
                 msg: 'Validation error',
                 errors: result.error.errors
@@ -68,7 +67,7 @@ route.post('/signup', async (req, res) => {
         }
     }
     catch(err) {
-        console.error("Error occurred during signup:", err);
+       
         return res.status(411).json({
             msg : "error occured"
         });
