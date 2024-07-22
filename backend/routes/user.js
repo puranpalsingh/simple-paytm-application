@@ -41,7 +41,7 @@ route.post('/signup', async (req, res) => {
 
                 await account.create({
                     userId : newUser._id,
-                    Balance : Math.floor(1 + Math.random() * 1000)
+                    Balance : 1 + Math.random() * 1000
                 });
 
             

@@ -18,23 +18,27 @@ router.get('/balance', authmiddleware, async (req,res) => {
 });
 
 router.post('/transfer', authmiddleware, async (req, res) => {
-    const session = mongoose.startSession();
-    (await session).startTransaction();
+    const session = await mongoose.startSession();
+   
+   session.startTransaction();
     const details = req.body;
-    const userId = req.body;
+    const userId = req.userId;
 
     if(!details.to) {
-        (await session).abortTransaction();
+        await session.abortTransaction();
+    
         res.status(400).json({
             msg : "please write the correct userId"
         });
     }
     try {
         const userAccount = await account.findOne({
-            userId
-        });
+            userId : userId
+        }).session(session);
+
         if(!userAccount || userAccount.Balance < details.amount) {
-            (await session).abortTransaction();
+            await session.abortTransaction();
+
             return res.status(400).json({
                 message: "Insufficient balance"
             });
@@ -43,12 +47,14 @@ router.post('/transfer', authmiddleware, async (req, res) => {
         const toAccount = await account.findOne({
             userId : details.to
         }).session(session);
+
         if(!toAccount) {
-            (await session).abortTransaction();
+            await session.abortTransaction();
             return res.status(400).json({
                 message: "account does not found"
             });
         }
+
         await account.findOneAndUpdate({
             userId : details.to
         }, {
@@ -63,7 +69,7 @@ router.post('/transfer', authmiddleware, async (req, res) => {
             userId : userId
         },{
             $inc : {
-                Balance : -amount
+                Balance : -details.amount
             }
         },{
             new : true
