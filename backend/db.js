@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
-const { Schema } = require('zod');
 
-mongoose.connect('mongodb+srv://singhpuranpal12:WBLc5aZbDppdRthE@cluster0.u6d1ctn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+mongoose.connect('mongodb+srv://singhpuranpal12:WBLc5aZbDppdRthE@cluster0.u6d1ctn.mongodb.net/paytm-application?retryWrites=true&w=majority&appName=Cluster0')
+.then (() => {
+    console.log('mongoose connect successfully');
+});
 
 const userschmea = new mongoose.Schema({
     username : {
@@ -30,9 +32,22 @@ const userschmea = new mongoose.Schema({
         trim : true
     }
 });
+const AccountSchema = new mongoose.Schema({
+    userId : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref  : 'User',
+        required : true
+    },
+    Balance : {
+        type : Number,
+        required : true
+    }
+});
 
+const account = mongoose.model('accounts',AccountSchema);
 const User = mongoose.model('users', userschmea);
 
 module.exports = {
-    User
+    User,
+    account
 };
